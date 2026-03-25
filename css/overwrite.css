@@ -1,0 +1,25 @@
+.yellow {
+    color: #FFD45A;
+}
+
+.lightOrange {
+    color: #FFA95A;
+}
+
+.orange {
+    color: #FF8B5A;
+}
+
+.red {
+    color: #FF5A5A;
+}
+
+a {
+    color: rgb(61, 61, 61);
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.geslachtItem {
+    color: black;
+}
