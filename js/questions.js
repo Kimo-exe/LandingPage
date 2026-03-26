@@ -58,10 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem("formData");
 
         // Go to confirm page
-
-        setTimeout(() => {
-          window.location.href = "/html/confirm.html";
-        }, 100); // 2 seconden
+        window.location.href = "/html/confirm.html";
 
       } else {
         alert("Fout bij opslaan: " + result.error);

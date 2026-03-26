@@ -1,4 +1,7 @@
-const express = require('express');
+const fetch = (...args) => 
+  import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+const express = require('express')
 const mongoose = require('mongoose');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
@@ -13,38 +16,37 @@ app.use(express.static(__dirname));
 
 // ✅ Root route – serve index.html
 app.get('/', (req, res) => {
-    req.sendFile(path.join(__dirname, 'html', 
-        'index.html'));
+  res.sendFile(path.join(__dirname, 'html',
+    'index.html'));
 });
 
 // ✅ MongoDB connectie
 mongoose.connect('mongodb://localhost:27017/Fanvest')
-    .then(() => console.log('✅ MongoDB connected'))
-    .catch(err => console.error('❌ MongoDB error:', err));
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB error:', err));
 
 // ✅ Schema
 const responseSchema = new mongoose.Schema({
-    firstName: String,
-    lastName: String,
-    gender: String,
-    email: String,
-    birthYear: Date,
-    location: String,
-    occupation: String,
-    function: String,
-    question1: String,
-    question2: String,
-    question3: String,
-    question4: String,
-    question5: String,
-    question6: String,
-    question7: String,
+  firstName: String,
+  lastName: String,
+  gender: String,
+  email: String,
+  birthYear: Date,
+  location: String,
+  occupation: String,
+  function: String,
+  question1: String,
+  question2: String,
+  question3: String,
+  question4: String,
+  question5: String,
+  question6: String,
+  question7: String,
 }, { timestamps: true });
 
 const Response = mongoose.model('Response', responseSchema, 'test_phase_landingPageQuestions');
 
 // ✅ Automail functie
-
 async function sendThankYouEmail(toEmail, firstName) {
   console.log("📧 sendThankYouEmail() is gestart!");
   console.log("📬 Email voorbereiden voor:", toEmail);
@@ -81,31 +83,46 @@ async function sendThankYouEmail(toEmail, firstName) {
   }
 }
 
+//google spreadsheet functie
+async function sendToGoogleSheet(data) {
+  const webhookUrl = "https://script.google.com/macros/s/AKfycbxfoPnY0hwQVxEJ8UH4oYSoLTJYIkrZTSXxwt7t_J-wsaUxX6nTq7LqEF6670hIRd3q/exec";
+  const res = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  console.log("✅ Google Sheets response:", await res.text());
+}
+
 
 // ✅ POST ROUTE
 app.post('/api/submit', async (req, res) => {
 
-    console.log("📨 POST route: we gaan nu de e-mail proberen te versturen!");
+  console.log("📨 POST route: we gaan nu de e-mail proberen te versturen!");
 
-    try {
-        console.log("✅ API request ontvangen:", req.body);
+  try {
+    console.log("✅ API request ontvangen:", req.body);
 
-        const doc = new Response(req.body);
-        await doc.save();
+    const doc = new Response(req.body);
+    await doc.save();
 
-        console.log("📬 Email wordt verstuurd naar:", req.body.email);
-        await sendThankYouEmail(req.body.email, req.body.firstName);
-        console.log("✅ POST route: sendThankYouEmail() is afgerond!");
+    // versturen naar google spreadsheet
+    await sendToGoogleSheet(req.body)
 
-        return res.json({ success: true, id: doc._id });
+    console.log("📬 Email wordt verstuurd naar:", req.body.email);
+    await sendThankYouEmail(req.body.email, req.body.firstName);
+    console.log("✅ POST route: sendThankYouEmail() is afgerond!");
 
-    } catch (err) {
-        console.error("❌ Error in POST route:", err);
-        return res.status(500).json({ success: false, error: err.message });
-    }
+    return res.json({ success: true, id: doc._id });
+
+  } catch (err) {
+    console.error("❌ Error in POST route:", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // ✅ Start server
 app.listen(3000, '0.0.0.0', () => {
-    console.log('🚀 Server running on http://localhost:3000');
+  console.log('🚀 Server running on http://localhost:3000');
 });
