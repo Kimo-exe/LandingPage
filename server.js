@@ -11,21 +11,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve HTML folder
+// Serve HTML folder
 app.use(express.static(__dirname));
 
-// ✅ Root route – serve index.html
+// Root route – serve index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'html',
     'index.html'));
 });
 
-// ✅ MongoDB connectie
+// MongoDB connectie
 mongoose.connect('mongodb://localhost:27017/Fanvest')
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
 
-// ✅ Schema
+// Schema
 const responseSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
@@ -77,9 +77,9 @@ async function sendThankYouEmail(toEmail, firstName) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email verzonden:", info.response);
+    console.log("Email verzonden:", info.response);
   } catch (err) {
-    console.error("❌ Email fout:", err);
+    console.error("Email fout:", err);
   }
 }
 
@@ -92,17 +92,17 @@ async function sendToGoogleSheet(data) {
     body: JSON.stringify(data)
   });
 
-  console.log("✅ Google Sheets response:", await res.text());
+  console.log("Google Sheets response:", await res.text());
 }
 
 
-// ✅ POST ROUTE
+// POST ROUTE
 app.post('/api/submit', async (req, res) => {
 
-  console.log("📨 POST route: we gaan nu de e-mail proberen te versturen!");
+  console.log("POST route: we gaan nu de e-mail proberen te versturen!");
 
   try {
-    console.log("✅ API request ontvangen:", req.body);
+    console.log("API request ontvangen:", req.body);
 
     const doc = new Response(req.body);
     await doc.save();
@@ -110,19 +110,19 @@ app.post('/api/submit', async (req, res) => {
     // versturen naar google spreadsheet
     await sendToGoogleSheet(req.body)
 
-    console.log("📬 Email wordt verstuurd naar:", req.body.email);
+    console.log("Email wordt verstuurd naar:", req.body.email);
     await sendThankYouEmail(req.body.email, req.body.firstName);
-    console.log("✅ POST route: sendThankYouEmail() is afgerond!");
+    console.log("POST route: sendThankYouEmail() is afgerond!");
 
     return res.json({ success: true, id: doc._id });
 
   } catch (err) {
-    console.error("❌ Error in POST route:", err);
+    console.error("Error in POST route:", err);
     return res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// ✅ Start server
+// Start server
 app.listen(3000, '0.0.0.0', () => {
-  console.log('🚀 Server running on http://localhost:3000');
+  console.log('Server running on http://localhost:3000');
 });
