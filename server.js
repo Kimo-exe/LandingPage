@@ -46,7 +46,7 @@ const responseSchema = new mongoose.Schema({
 
 const Response = mongoose.model('Response', responseSchema, 'test_phase_landingPageQuestions');
 
-// ✅ Automail functie
+// Automail functie
 async function sendThankYouEmail(toEmail, firstName) {
   console.log("📧 sendThankYouEmail() is gestart!");
   console.log("📬 Email voorbereiden voor:", toEmail);
